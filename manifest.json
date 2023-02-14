@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "exusiai",
+  "version": "0.12.24",
+  "icons": {
+    "200": "images/exue2-200.png"
+  },
+  "action": {
+    "default_popup": "src/popup.html"
+  },
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.nhentai.net/*"],
+      "js": ["src/nhentai.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "matches": [ "https://*.nhentai.net/*" ],
+      "resources": ["images/*"]
+    }
+  ]
+}
