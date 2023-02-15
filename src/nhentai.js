@@ -41,8 +41,16 @@ const generateGalleryURLs = (pageCount, galleryURLComponents) => {
   return galleryURLs;
 };
 
-const downloadDoujinImage = async (doujinTitle, imageURL, fileName) => {
+const downloadDoujinImage = async (
+  doujinTitle,
+  galleryBaseURL,
+  fileName,
+  fileExtension,
+  otherFileExtensionTried = false
+) => {
+  const imageURL = `${galleryBaseURL}/${fileName}.${fileExtension}`;
   console.log(`Downloading: ${imageURL}`);
+
   chrome.runtime
     .sendMessage({
       query: "download",
@@ -50,9 +58,27 @@ const downloadDoujinImage = async (doujinTitle, imageURL, fileName) => {
         doujinTitle,
         imageURL,
         fileName,
+        fileExtension,
       },
     })
-    .then((response) => console.log(response));
+    .then(({ success, error }) => {
+      if (success) {
+        console.log(`Downloaded: ${imageURL}`);
+      } else if (
+        error.current === "SERVER_BAD_CONTENT" &&
+        otherFileExtensionTried === false
+      ) {
+        otherFileExtension =
+          fileExtension.toLowerCase() === "jpg" ? "png" : "jpg";
+        console.log(`Download Failed: Trying ${otherFileExtension}`);
+        downloadDoujinImage(
+          doujinTitle,
+          galleryBaseURL,
+          fileName,
+          fileExtension
+        );
+      }
+    });
 };
 
 const exuOnClickHandler = async () => {
@@ -62,7 +88,10 @@ const exuOnClickHandler = async () => {
   const galleryURLs = generateGalleryURLs(pageCount, galleryURLComponents);
 
   for (galleryURL of galleryURLs) {
-    downloadDoujinImage(sluggledTitle, galleryURL, galleryURL.split("/").pop());
+    const galleryURLSplits = galleryURL.split("/");
+    const [fileName, fileExtension] = galleryURLSplits.pop().split(".");
+    const galleryURLBase = galleryURLSplits.join("/");
+    downloadDoujinImage(sluggledTitle, galleryURLBase, fileName, fileExtension);
   }
 };
 
@@ -82,16 +111,3 @@ const main = async () => {
 };
 
 main();
-
-// console.log(messages);
-
-// var imgURL = chrome.extension.getURL("../images/exu265.png");
-// console.log(imgURL);
-
-// (
-//   async () => {
-//     const response = await chrome.runtime.sendMessage({ greeting: "hello" });
-//     // do something with response here, not outside the function
-//     console.log(response);
-//   }
-// )();

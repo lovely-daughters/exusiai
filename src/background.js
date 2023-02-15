@@ -33,9 +33,9 @@ chrome.downloads.onChanged.addListener(function ({ id, state, error }) {
 });
 
 async function downloadImage(request, sendResponse) {
-  const { doujinTitle, imageURL, fileName } = request.body;
+  const { doujinTitle, imageURL, fileName, fileExtension } = request.body;
   const downloadId = await chrome.downloads.download({
-    filename: `${doujinTitle}/${fileName}`,
+    filename: `${doujinTitle}/${fileName}.${fileExtension}`,
     url: imageURL,
   });
   const success = await onDownloadComplete(downloadId);
