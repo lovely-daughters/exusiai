@@ -61,6 +61,7 @@ const exuOnClickHandler = async () => {
   const galleryURLs = generateGalleryURLs(pageCount, galleryURLComponents);
 
   for (galleryURL of galleryURLs) {
+    // downloadDoujinImage(sluggledTitle, galleryURL, galleryURL.split("/").pop());
     await downloadDoujinImage(
       sluggledTitle,
       galleryURL,
