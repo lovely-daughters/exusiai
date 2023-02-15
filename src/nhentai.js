@@ -64,20 +64,20 @@ const downloadDoujinImage = async (
     .then(({ success, error }) => {
       if (success) {
         console.log(`COMPLETE: ${imageURL}`);
-      } else if (
-        error.current === "SERVER_BAD_CONTENT" &&
-        otherFileExtensionTried === false
-      ) {
-        otherFileExtension =
-          fileExtension.toLowerCase() === "jpg" ? "png" : "jpg";
-        console.log(`Download Failed: Trying ${otherFileExtension}`);
-        downloadDoujinImage(
-          doujinTitle,
-          galleryBaseURL,
-          fileName,
-          otherFileExtension,
-          true
-        );
+      } else if (error.current === "SERVER_BAD_CONTENT") {
+        console.log(`SERVER_BAD_CONTENT`);
+        if (otherFileExtensionTried === false) {
+          otherFileExtension =
+            fileExtension.toLowerCase() === "jpg" ? "png" : "jpg";
+          console.log(`Trying ${otherFileExtension}`);
+          downloadDoujinImage(
+            doujinTitle,
+            galleryBaseURL,
+            fileName,
+            otherFileExtension,
+            true
+          );
+        }
       }
       // i need to observe to see the overload error
     });
