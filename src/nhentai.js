@@ -63,7 +63,7 @@ const downloadDoujinImage = async (
     })
     .then(({ success, error }) => {
       if (success) {
-        console.log(`Downloaded: ${imageURL}`);
+        console.log(`COMPLETE: ${imageURL}`);
       } else if (
         error.current === "SERVER_BAD_CONTENT" &&
         otherFileExtensionTried === false
@@ -75,7 +75,8 @@ const downloadDoujinImage = async (
           doujinTitle,
           galleryBaseURL,
           fileName,
-          fileExtension
+          otherFileExtension,
+          true
         );
       }
     });
