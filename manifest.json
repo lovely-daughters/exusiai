@@ -4,7 +4,10 @@
   "version": "0.12.24",
   "permissions": ["downloads"],
   "icons": {
-    "200": "images/exue2-200.png"
+    "16": "images/exu_e2-16.png",
+    "32": "images/exu_e2-32.png",
+    "48": "images/exu_e2-48.png",
+    "128": "images/exu_e2-128.png"
   },
   "action": {
     "default_popup": "src/popup.html"
