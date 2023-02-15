@@ -106,6 +106,7 @@ const exuOnClickHandler = async () => {
     const [fileName, fileExtension] = galleryURLSplits.pop().split(".");
     const galleryURLBase = galleryURLSplits.join("/");
     downloadDoujinImage(sluggledTitle, galleryURLBase, fileName, fileExtension);
+    await new Promise((resolve) => setTimeout(resolve, 500));
   }
 };
 
