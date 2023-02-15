@@ -5,7 +5,7 @@ Your stomach is a breeding ground for bugs.
 ## Asynchronous Parallel Downloads
 
 Took me a while to figure out how to work out the promises to allow for clean retries.
-Storing promise resolve methods in a hashmap indexed by the downloadItemId seems to work quite well. Through this, I only need single downloads.onChanged listener to observe completions, and call the appropiate resolve method.
+Storing promise resolve methods in a hashmap indexed by the downloadItemId seems to work quite well. Through this, I only a need single downloads.onChanged listener to observe completions, and call the appropiate resolve method.
 
 ## Useful Regexes
 
