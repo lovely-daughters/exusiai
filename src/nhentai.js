@@ -46,7 +46,7 @@ const downloadDoujinImage = async (
   galleryBaseURL,
   fileName,
   fileExtension,
-  retrying = false
+  timesFailed = 0
 ) => {
   const imageURL = `${galleryBaseURL}/${fileName}.${fileExtension}`;
   console.log(`Downloading: ${imageURL}`);
@@ -66,7 +66,7 @@ const downloadDoujinImage = async (
         console.log(`COMPLETE: ${imageURL}`);
       } else if (error.current === "SERVER_BAD_CONTENT") {
         console.log(`SERVER_BAD_CONTENT`);
-        if (retrying === false) {
+        if (timesFailed === 0) {
           otherFileExtension =
             fileExtension.toLowerCase() === "jpg" ? "png" : "jpg";
           console.log(`Trying ${otherFileExtension}`);
@@ -75,7 +75,19 @@ const downloadDoujinImage = async (
             galleryBaseURL,
             fileName,
             otherFileExtension,
-            true
+            timesFailed + 1
+          );
+        }
+      } else if (error.current === "SERVER_FAILED") {
+        console.log("SERVER_FAILED");
+        if (timesFailed < 3) {
+          console.log(`TIMES FAILED (${timesFailed}): ${imageURL}`);
+          downloadDoujinImage(
+            doujinTitle,
+            galleryBaseURL,
+            fileName,
+            fileExtension,
+            timesFailed + 1
           );
         }
       }
