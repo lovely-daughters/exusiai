@@ -43,15 +43,16 @@ const generateGalleryURLs = (pageCount, galleryURLComponents) => {
 
 const downloadDoujinImage = async (doujinTitle, imageURL, fileName) => {
   console.log(`Downloading: ${imageURL}`);
-  const response = await chrome.runtime.sendMessage({
-    query: "download",
-    body: {
-      doujinTitle,
-      imageURL,
-      fileName,
-    },
-  });
-  console.log(`Downloaded To: ${response}`);
+  chrome.runtime
+    .sendMessage({
+      query: "download",
+      body: {
+        doujinTitle,
+        imageURL,
+        fileName,
+      },
+    })
+    .then((response) => console.log(response));
 };
 
 const exuOnClickHandler = async () => {
@@ -61,12 +62,7 @@ const exuOnClickHandler = async () => {
   const galleryURLs = generateGalleryURLs(pageCount, galleryURLComponents);
 
   for (galleryURL of galleryURLs) {
-    // downloadDoujinImage(sluggledTitle, galleryURL, galleryURL.split("/").pop());
-    await downloadDoujinImage(
-      sluggledTitle,
-      galleryURL,
-      galleryURL.split("/").pop()
-    );
+    downloadDoujinImage(sluggledTitle, galleryURL, galleryURL.split("/").pop());
   }
 };
 
