@@ -2,6 +2,7 @@
   "manifest_version": 3,
   "name": "exusiai",
   "version": "0.12.24",
+  "permissions": ["downloads"],
   "icons": {
     "200": "images/exue2-200.png"
   },

@@ -13,7 +13,11 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     const exuDataURL = chrome.runtime.getURL("../images/exuKyaa.png");
     sendResponse(exuDataURL);
   } else if (request.query === "download") {
-    console.log(request.body);
+    const { doujinTitle, imageURL, fileName } = request.body;
+    chrome.downloads.download({
+      filename: `${doujinTitle}/${fileName}`,
+      url: imageURL,
+    });
     sendResponse("sanity check");
   }
 });
