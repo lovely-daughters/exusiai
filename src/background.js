@@ -26,6 +26,7 @@ async function downloadImage(request, sendResponse) {
     url: imageURL,
   });
   const result = await onDownloadComplete(downloadId);
+  wrappedLog(result.error);
   sendResponse(result);
 }
 

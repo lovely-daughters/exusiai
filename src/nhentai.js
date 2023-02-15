@@ -46,7 +46,7 @@ const downloadDoujinImage = async (
   galleryBaseURL,
   fileName,
   fileExtension,
-  otherFileExtensionTried = false
+  retrying = false
 ) => {
   const imageURL = `${galleryBaseURL}/${fileName}.${fileExtension}`;
   console.log(`Downloading: ${imageURL}`);
@@ -66,7 +66,7 @@ const downloadDoujinImage = async (
         console.log(`COMPLETE: ${imageURL}`);
       } else if (error.current === "SERVER_BAD_CONTENT") {
         console.log(`SERVER_BAD_CONTENT`);
-        if (otherFileExtensionTried === false) {
+        if (retrying === false) {
           otherFileExtension =
             fileExtension.toLowerCase() === "jpg" ? "png" : "jpg";
           console.log(`Trying ${otherFileExtension}`);
