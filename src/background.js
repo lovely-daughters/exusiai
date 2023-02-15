@@ -1,17 +1,19 @@
 function wrappedLog(text) {
-  console.log(`EXUSIAI: ${text}`);
+  console.log(`E_X_U_S_I_A_I\n${text}`);
 }
 
-wrappedLog(chrome.runtime.id);
-wrappedLog("service worker active");
-
-const exuDataURL = chrome.runtime.getURL("../images/exu265.png");
+wrappedLog(`ID: ${chrome.runtime.id} \nService Worker Active`);
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  wrappedLog(`Message Received: ${sender.tab.url}`);
+  wrappedLog(
+    `Message Received From: ${sender.tab.url}\n${JSON.stringify(request)}`
+  );
 
-  if (request.atDoujin === true) {
-    wrappedLog(`Doujin Found: ${sender.tab.url}`);
+  if (request.query === "exuKyaaDataURL") {
+    const exuDataURL = chrome.runtime.getURL("../images/exuKyaa.png");
     sendResponse(exuDataURL);
+  } else if (request.query === "download") {
+    console.log(request.body);
+    sendResponse("sanity check");
   }
 });

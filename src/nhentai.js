@@ -1,3 +1,10 @@
+const getDoujinTitle = async () => {
+  const titleElement = document.getElementsByTagName("h1")[0];
+  const title = titleElement.textContent;
+  const sluggedTitle = title.replace(/[^a-z0-9_\-\[\]() ]/gi, "_");
+  return [title, sluggedTitle];
+};
+
 const getDoujinPageCount = async () => {
   const tagsElementText = document.getElementById("tags").outerText;
   const match = [
@@ -34,23 +41,40 @@ const generateGalleryURLs = (pageCount, galleryURLComponents) => {
   return galleryURLs;
 };
 
+const downloadDoujinImage = async (doujinTitle, imageURL) => {
+  console.log(doujinTitle, imageURL);
+
+  const response = await chrome.runtime.sendMessage({
+    query: "download",
+    body: {
+      doujinTitle,
+      imageURL,
+    },
+  });
+};
+
 const exuOnClickHandler = async () => {
+  const [title, sluggledTitle] = await getDoujinTitle();
   const pageCount = await getDoujinPageCount();
   const galleryURLComponents = await getGalleryURLComponents();
   const galleryURLs = generateGalleryURLs(pageCount, galleryURLComponents);
-  console.log(galleryURLs);
+
+  for (galleryURL of galleryURLs) {
+    downloadDoujinImage(sluggledTitle, galleryURL);
+    break;
+  }
+  // console.log(galleryURLs[0]);
 };
 
 const main = async () => {
   if (
     window.location.href.match(/^https:\/\/(.*)nhentai\.net\/g\/([0-9]+)\/$/i)
   ) {
-    console.log(window.location.href);
+    const exuKyaaDataURL = await chrome.runtime.sendMessage({
+      query: "exuKyaaDataURL",
+    });
 
-    const exuDataURL = await chrome.runtime.sendMessage({ atDoujin: true });
-    console.log(exuDataURL);
-
-    document.body.innerHTML += `<img id="exu" style="position:fixed; top:10px; right:10px; border-radius:10px; cursor:pointer;" width="64" height="64" src='${exuDataURL}'>`;
+    document.body.innerHTML += `<img id="exu" style="position:fixed; top:10px; right:10px; border-radius:10px; cursor:pointer;" width="64" height="64" src='${exuKyaaDataURL}'>`;
 
     const exu = document.getElementById("exu");
     exu.addEventListener("click", exuOnClickHandler);
