@@ -12,4 +12,6 @@ Your stomach is a breeding ground for bugs.
 
 - https://nhentai.net/g/180032/
   - Has a mix of jpg & png
+- Any Doujin With a Lot of Pages
+  - Good chance to hit "SERVER_FAILELD" error
   
