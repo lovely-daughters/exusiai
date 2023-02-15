@@ -18,6 +18,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       filename: `${doujinTitle}/${fileName}`,
       url: imageURL,
     });
-    sendResponse("sanity check");
+    sendResponse(`${doujinTitle}/${fileName}`);
   }
 });
