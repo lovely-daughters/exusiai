@@ -24,7 +24,7 @@ interface GalleryURLComponents {
   fileType: string;
 }
 const getGalleryURLComponents = async (): Promise<GalleryURLComponents> => {
-  const firstPageHTML = await fetch(`${window.location.href}/1/`, {
+  const firstPageHTML = await fetch(`${window.location.href}1/`, {
     method: "GET",
   }).then((res) => res.text());
 
@@ -117,7 +117,6 @@ const exuOnClickHandler = async () => {
     const [fileName, fileExtension] = galleryURLSplits.pop()!.split(".");
     const galleryURLBase = galleryURLSplits.join("/");
     downloadDoujinImage(sluggledTitle, galleryURLBase, fileName, fileExtension);
-    await new Promise((resolve) => setTimeout(resolve, 500));
   }
 };
 

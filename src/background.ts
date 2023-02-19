@@ -5,9 +5,13 @@ log(`***-APPLE_CREAM_PIE-***`);
 log(`ID: ${chrome.runtime.id} \nService Worker Active`);
 
 interface DownloadItem {
-  url: string;
+  fileName: string;
+  imageURL: string;
 }
 const downloadQueue: DownloadItem[] = [];
+interface DownloadResult {
+  error: string;
+}
 
 /**
  * initiateDownloadSystem()
@@ -22,7 +26,9 @@ const downloadQueue: DownloadItem[] = [];
  */
 async function initiateDownloadSystem<DownloadItem>(
   downloadQueue: DownloadItem[],
-  numWorkers: number
+  numWorkers: number,
+  download: (item: DownloadItem) => Promise<{ error: string }>,
+  sendResult: (result: DownloadResult, item: DownloadItem) => void
 ) {
   const sleep = async (duration: number = 500) => {
     await new Promise((resolve) => setTimeout(resolve, duration));
@@ -46,9 +52,10 @@ async function initiateDownloadSystem<DownloadItem>(
 
     while (true) {
       if (DWQueue.length) {
-        const item = DWQueue.shift();
+        const item: DownloadItem = DWQueue.shift()!;
+        const result = await download(item);
+        sendResult(result, item);
         DWLog(`Processed ${JSON.stringify(item)}`);
-        await sleep(Math.random() * 500);
       } else await sleep();
     }
   };
@@ -85,19 +92,23 @@ async function initiateDownloadSystem<DownloadItem>(
   initiateDownloadWorkerManager(numWorkers);
 }
 
-initiateDownloadSystem(downloadQueue, 3);
-
-for (var index = 0; index < 100; index++) {
-  downloadQueue.push({ url: String(index) });
-}
-
-const downloadPromises = new Map();
-const onDownloadComplete = (downloadId: string) => {
-  return new Promise((resolve) => {
-    downloadPromises.set(downloadId, resolve);
-  });
+const sendResponseMap = new Map<string, (response?: any) => void>();
+const enqueueDownload = (
+  item: DownloadItem,
+  sendResponse: (response?: any) => void
+) => {
+  sendResponseMap.set(item.imageURL, sendResponse);
+  downloadQueue.push(item);
 };
 
+const downloadPromises = new Map();
+const onDownloadComplete = (
+  downloadItemId: number
+): Promise<{ success: string; error: string }> => {
+  return new Promise((resolve) => {
+    downloadPromises.set(downloadItemId, resolve);
+  });
+};
 chrome.downloads.onChanged.addListener(function ({ id, state, error }) {
   if (state && state.current !== "in_progress") {
     const resolve = downloadPromises.get(id);
@@ -106,20 +117,22 @@ chrome.downloads.onChanged.addListener(function ({ id, state, error }) {
   }
 });
 
-async function downloadImage(
-  request: any, // prettier-ignore
-  sendResponse: (res: any) => void
-) {
-  const { doujinTitle, imageURL, fileName, fileExtension } = request.body;
-  downloadQueue.push({ url: `${doujinTitle}/${fileName}.${fileExtension}` });
-  // const downloadId = await chrome.downloads.download({
-  //   filename: `${doujinTitle}/${fileName}.${fileExtension}`,
-  //   url: imageURL,
-  // });
-  // const result = await onDownloadComplete(downloadId);
-  // wrappedLog(JSON.stringify(result.error));
-  // sendResponse(result);
-}
+initiateDownloadSystem<DownloadItem>(
+  downloadQueue,
+  3,
+  async ({ fileName, imageURL }: DownloadItem) => {
+    const downloadItemId = await chrome.downloads.download({
+      filename: fileName,
+      url: imageURL,
+    });
+    const result = await onDownloadComplete(downloadItemId);
+    return result;
+  },
+  (result, item) => {
+    const sendResponse = sendResponseMap.get(item.imageURL)!;
+    sendResponse(result);
+  }
+);
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   log(`Message Received: ${sender?.tab?.url}\n${JSON.stringify(request)}`);
@@ -128,8 +141,15 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     const exuDataURL = chrome.runtime.getURL("../images/exuKyaa.png");
     sendResponse(exuDataURL);
   } else if (request.query === "download") {
-    downloadImage(request, sendResponse);
+    const { doujinTitle, imageURL, fileName, fileExtension } = request.body;
+    enqueueDownload(
+      {
+        fileName: `${doujinTitle}/${fileName}.${fileExtension}`,
+        imageURL: imageURL,
+      },
+      sendResponse
+    );
   }
 
-  return true; // weird way to go about async
+  return true;
 });
