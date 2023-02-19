@@ -1,3 +1,7 @@
+const wrappedLog = (string) => {
+  // console.log(string);
+};
+
 const getDoujinTitle = async () => {
   const titleElement = document.getElementsByTagName("h1")[0];
   const title = titleElement.textContent;
@@ -49,7 +53,7 @@ const downloadDoujinImage = async (
   timesFailed = 0
 ) => {
   const imageURL = `${galleryBaseURL}/${fileName}.${fileExtension}`;
-  console.log(`Downloading: ${imageURL}`);
+  wrappedLog(`Download Request Sent: ${imageURL}`);
 
   chrome.runtime
     .sendMessage({
@@ -63,13 +67,13 @@ const downloadDoujinImage = async (
     })
     .then(({ success, error }) => {
       if (success) {
-        console.log(`COMPLETE: ${imageURL}`);
+        wrappedLog(`COMPLETE: ${imageURL}`);
       } else if (error.current === "SERVER_BAD_CONTENT") {
-        console.log(`SERVER_BAD_CONTENT`);
+        wrappedLog(`SERVER_BAD_CONTENT`);
         if (timesFailed === 0) {
           otherFileExtension =
             fileExtension.toLowerCase() === "jpg" ? "png" : "jpg";
-          console.log(`Trying ${otherFileExtension}`);
+          wrappedLog(`Trying ${otherFileExtension}`);
           downloadDoujinImage(
             doujinTitle,
             galleryBaseURL,
@@ -79,9 +83,9 @@ const downloadDoujinImage = async (
           );
         }
       } else if (error.current === "SERVER_FAILED") {
-        console.log("SERVER_FAILED");
+        wrappedLog("SERVER_FAILED");
         if (timesFailed < 3) {
-          console.log(`TIMES FAILED (${timesFailed}): ${imageURL}`);
+          wrappedLog(`TIMES FAILED (${timesFailed}): ${imageURL}`);
           downloadDoujinImage(
             doujinTitle,
             galleryBaseURL,

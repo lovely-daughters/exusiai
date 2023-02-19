@@ -2,8 +2,6 @@ function wrappedLog(text) {
   console.log(`APPLE_PIE\n${text}`);
 }
 
-const downloadQueue = [];
-
 wrappedLog(`ID: ${chrome.runtime.id} \nService Worker Active`);
 
 const downloadPromises = new Map();
@@ -21,23 +19,15 @@ chrome.downloads.onChanged.addListener(function ({ id, state, error }) {
   }
 });
 
-// would there ever be an issue with race conditions?
-// distributes a download to a worker
-// asynchronous programming is taking me a bit to wrap my head around
-// i guess that it will look at the shortest queue and add it to that one?
-// i guess let me first see if there's going to be race conditions
-async function downloadManager() {}
-
 async function downloadImage(request, sendResponse) {
   const { doujinTitle, imageURL, fileName, fileExtension } = request.body;
-  downloadQueue.push(`${doujinTitle}/${fileName}.${fileExtension}`);
-  // const downloadId = await chrome.downloads.download({
-  //   filename: `${doujinTitle}/${fileName}.${fileExtension}`,
-  //   url: imageURL,
-  // });
-  // const result = await onDownloadComplete(downloadId);
-  // wrappedLog(JSON.stringify(result.error));
-  // sendResponse(result);
+  const downloadId = await chrome.downloads.download({
+    filename: `${doujinTitle}/${fileName}.${fileExtension}`,
+    url: imageURL,
+  });
+  const result = await onDownloadComplete(downloadId);
+  wrappedLog(JSON.stringify(result.error));
+  sendResponse(result);
 }
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
@@ -52,5 +42,5 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     downloadImage(request, sendResponse);
   }
 
-  return true; // weird way to go about async
+  return true;
 });
