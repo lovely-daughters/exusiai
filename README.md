@@ -1,13 +1,15 @@
 # My Precious Lemuel,
 
-Your stomach is a breeding ground for bugs.
+<!-- Your stomach is a breeding ground for bugs. -->
 
-<img src="images/exu_e2.png" width=512 height=512>
+![Lemuel](images/exu_e2.png)
 
 ## Asynchronous Parallel Downloads
 
 Took me a while to figure out how to work out the promises to allow for clean retries.
-Storing promise resolve methods in a hashmap indexed by the downloadItemId seems to work quite well. Through this, I only a need single downloads.onChanged listener to observe completions, and call the appropiate resolve method.
+Storing promise resolve methods in a hashmap indexed by the downloadItemId seems to work quite well. Through this, I only a need single downloads.onChanged listener to observe completions and call the appropiate resolve method.
+
+Furthermore, I've implemented a worker/manager system for controlling the # of download threads.
 
 ## Useful Regexes
 
@@ -17,8 +19,8 @@ Storing promise resolve methods in a hashmap indexed by the downloadItemId seems
 
 ## Interesting Test Cases
 
-- https://nhentai.net/g/180032/
-  - Has a mix of jpg & png
+- Doujins w. mix of JPG & PNG
+  - "SERVER_BAD_CONTENT"
 - Any Doujin With a Lot of Pages
-  - Good chance to hit "SERVER_FAILELD" error
+  - "SERVER_FAILELD"
   
