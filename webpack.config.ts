@@ -25,12 +25,16 @@ const config: webpack.Configuration = {
     new CopyPlugin({
       patterns: [
         {
-          from: path.join(__dirname, "images"),
-          to: path.join(__dirname, "dist", "images"),
-        },
-        {
           from: path.join(__dirname, "manifest.json"),
           to: path.join(__dirname, "dist", "manifest.json"),
+        },
+        {
+          from: path.join(__dirname, "src", "popup.html"),
+          to: path.join(__dirname, "dist", "src", "popup.html"),
+        },
+        {
+          from: path.join(__dirname, "images"),
+          to: path.join(__dirname, "dist", "images"),
         },
       ],
     }),
