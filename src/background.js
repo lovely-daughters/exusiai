@@ -1,10 +1,43 @@
-function wrappedLog(text) {
-  console.log(`APPLE_PIE\n${text}`);
-}
+const log = (text) => {
+  console.log(text);
+};
+log(`***-APPLE_CREAM_PIE-***`);
+log(`ID: ${chrome.runtime.id} \nService Worker Active`);
 
 const downloadQueue = [];
 
-wrappedLog(`ID: ${chrome.runtime.id} \nService Worker Active`);
+// i could have a system where every download worker has their own queue
+// distribute evenly across download workers
+const initiateDownloadWorkers = (numWorkers) => {
+  const downloadWorker = async (workerId) => {
+    const downloadWorkerLog = (text) => {
+      log(`DW-${workerId}: ${text}`);
+    };
+    downloadWorkerLog(`Initiated`);
+
+    while (true) {
+      if (downloadQueue.length) {
+        const imageUrl = downloadQueue.shift();
+        downloadWorkerLog(`Processed ${imageUrl}`);
+        await new Promise((resolve) =>
+          setTimeout(resolve, Math.random() * 500)
+        );
+      } else {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+    }
+  };
+
+  for (var index = 0; index < numWorkers; index++) {
+    downloadWorker(String(index).padStart(3, "0"));
+  }
+};
+
+initiateDownloadWorkers(3);
+
+for (var index = 0; index < 100; index++) {
+  downloadQueue.push(index);
+}
 
 const downloadPromises = new Map();
 const onDownloadComplete = (downloadId) => {
