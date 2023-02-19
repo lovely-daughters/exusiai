@@ -11,12 +11,6 @@ Storing promise resolve methods in a hashmap indexed by the downloadItemId seems
 
 Furthermore, I've implemented a worker/manager system for controlling the # of download threads.
 
-## Useful Regexes
-
-- Check Current Page URL: https://regex101.com/r/BZ0PY7/1
-- Get Doujin Page Count: https://regex101.com/r/WyBuKZ/1
-- Extract First Doujin Image URL: https://regex101.com/r/v6BJcV/6
-
 ## Interesting Test Cases
 
 - Doujins w. mix of JPG & PNG
@@ -24,3 +18,8 @@ Furthermore, I've implemented a worker/manager system for controlling the # of d
 - Any Doujin With a Lot of Pages
   - "SERVER_FAILELD"
   
+## Useful Regexes
+
+- Check Current Page URL: https://regex101.com/r/BZ0PY7/1
+- Get Doujin Page Count: https://regex101.com/r/WyBuKZ/1
+- Extract First Doujin Image URL: https://regex101.com/r/v6BJcV/6
