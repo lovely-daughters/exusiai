@@ -92,7 +92,7 @@ for (var index = 0; index < 100; index++) {
 }
 
 const downloadPromises = new Map();
-const onDownloadComplete = (downloadId) => {
+const onDownloadComplete = (downloadId: string) => {
   return new Promise((resolve) => {
     downloadPromises.set(downloadId, resolve);
   });
@@ -106,7 +106,10 @@ chrome.downloads.onChanged.addListener(function ({ id, state, error }) {
   }
 });
 
-async function downloadImage(request, sendResponse) {
+async function downloadImage(
+  request: any, // prettier-ignore
+  sendResponse: (res: any) => void
+) {
   const { doujinTitle, imageURL, fileName, fileExtension } = request.body;
   downloadQueue.push({ url: `${doujinTitle}/${fileName}.${fileExtension}` });
   // const downloadId = await chrome.downloads.download({
