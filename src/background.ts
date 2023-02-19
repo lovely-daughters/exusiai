@@ -47,7 +47,7 @@ async function initiateDownloadSystem<DownloadItem>(
     while (true) {
       if (DWQueue.length) {
         const item = DWQueue.shift();
-        DWLog(`Processed ${item}`);
+        DWLog(`Processed ${JSON.stringify(item)}`);
         await sleep(Math.random() * 500);
       } else await sleep();
     }
@@ -72,7 +72,7 @@ async function initiateDownloadSystem<DownloadItem>(
         DWQueueMap 
           ?.get(generateWorkerId(assignedDWId))
           ?.push(item);
-        DWMLog(`${item} => ${assignedDWId}`);
+        DWMLog(`${JSON.stringify(item)} => ${assignedDWId}`);
 
         downloadsProcessed += 1;
       } else await sleep();
