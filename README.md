@@ -2,6 +2,8 @@
 
 Your stomach is a breeding ground for bugs.
 
+![Lemuel](images/exu_e2.png)
+
 ## Asynchronous Parallel Downloads
 
 Took me a while to figure out how to work out the promises to allow for clean retries.
