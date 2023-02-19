@@ -2,7 +2,7 @@
 
 Your stomach is a breeding ground for bugs.
 
-![Lemuel](images/exu_e2.png)
+![Lemuel](images/exu_e2.png = 300x300)
 
 ## Asynchronous Parallel Downloads
 
