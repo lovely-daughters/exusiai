@@ -87,6 +87,10 @@ async function initiateDownloadSystem<DownloadItem>(
 
 initiateDownloadSystem(downloadQueue, 3);
 
+for (var index = 0; index < 100; index++) {
+  downloadQueue.push({ url: String(index) });
+}
+
 const downloadPromises = new Map();
 const onDownloadComplete = (downloadId) => {
   return new Promise((resolve) => {
@@ -101,13 +105,6 @@ chrome.downloads.onChanged.addListener(function ({ id, state, error }) {
     resolve({ success: state.current === "complete", error });
   }
 });
-
-// would there ever be an issue with race conditions?
-// distributes a download to a worker
-// asynchronous programming is taking me a bit to wrap my head around
-// i guess that it will look at the shortest queue and add it to that one?
-// i guess let me first see if there's going to be race conditions
-async function downloadManager() {}
 
 async function downloadImage(request, sendResponse) {
   const { doujinTitle, imageURL, fileName, fileExtension } = request.body;
