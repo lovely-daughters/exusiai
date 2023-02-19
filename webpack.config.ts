@@ -1,5 +1,6 @@
 import * as path from "path";
 import * as webpack from "webpack";
+import CopyPlugin from "copy-webpack-plugin";
 
 const config: webpack.Configuration = {
   mode: "development",
@@ -9,6 +10,7 @@ const config: webpack.Configuration = {
   },
   output: {
     path: path.join(__dirname, "dist", "src"),
+    filename: "[name].js",
   },
   module: {
     rules: [
@@ -19,6 +21,20 @@ const config: webpack.Configuration = {
       },
     ],
   },
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.join(__dirname, "images"),
+          to: path.join(__dirname, "dist", "images"),
+        },
+        {
+          from: path.join(__dirname, "manifest.json"),
+          to: path.join(__dirname, "dist", "manifest.json"),
+        },
+      ],
+    }),
+  ],
   optimization: {
     minimize: false,
   },
