@@ -1,43 +1,71 @@
-const log = (text) => {
-  console.log(text);
-};
+const log = (text) => { console.log(text); };
 log(`***-APPLE_CREAM_PIE-***`);
 log(`ID: ${chrome.runtime.id} \nService Worker Active`);
 
 const downloadQueue = [];
 
-// i could have a system where every download worker has their own queue
-// distribute evenly across download workers
-const initiateDownloadWorkers = (numWorkers) => {
-  const downloadWorker = async (workerId) => {
-    const downloadWorkerLog = (text) => {
-      log(`DW-${workerId}: ${text}`);
+const initiateDownloadSystem = async (downloadQueue, numWorkers) => {
+  const sleep = async (duration = 500) => {
+    await new Promise((resolve) => setTimeout(resolve, duration));
+  };
+
+  const generateWorkerId = (num) => {
+    return `DW-${String(num).padStart(3, "0")}`;
+  };
+
+  const DWQueueMap = new Map();
+  const initiateDownloadWorker = async (workerId) => {
+    const DWQueue = [];
+    DWQueueMap.set(workerId, DWQueue);
+
+    const DWLog = (text) => {
+      log(`${workerId}: ${text}`);
     };
-    downloadWorkerLog(`Initiated`);
+    DWLog(`Initiated`);
+
+    while (true) {
+      if (DWQueue.length) {
+        const item = DWQueue.shift();
+        DWLog(`Processed ${item}`);
+        await sleep(Math.random() * 500)
+      } else await sleep();
+    }
+  };
+
+  const initiateDownloadWorkerManager = async (numWorkers) => {
+    var downloadsProcessed = 0;
+
+    const DWMLog = (text) => { log(`DWM: ${text}`); };
+    DWMLog(`Initiated`);
 
     while (true) {
       if (downloadQueue.length) {
-        const imageUrl = downloadQueue.shift();
-        downloadWorkerLog(`Processed ${imageUrl}`);
-        await new Promise((resolve) =>
-          setTimeout(resolve, Math.random() * 500)
-        );
-      } else {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-      }
+        const item = downloadQueue.shift();
+        const assignedDWId = downloadsProcessed % numWorkers
+        const assignedDWQueue = DWQueueMap.get(generateWorkerId(assignedDWId));
+        assignedDWQueue.push(item)
+        DWMLog(`${item} => ${assignedDWId}`)
+
+        downloadsProcessed += 1;
+      } else await sleep();
     }
   };
 
   for (var index = 0; index < numWorkers; index++) {
-    downloadWorker(String(index).padStart(3, "0"));
+    initiateDownloadWorker(generateWorkerId(index));
+  }
+  initiateDownloadWorkerManager(numWorkers);
+
+  await sleep(1500);
+  console.log(DWQueueMap)
+  for (var index = 0; index < 100; index++) {
+    downloadQueue.push(index);
   }
 };
 
-initiateDownloadWorkers(3);
+initiateDownloadSystem(downloadQueue, 3);
 
-for (var index = 0; index < 100; index++) {
-  downloadQueue.push(index);
-}
+
 
 const downloadPromises = new Map();
 const onDownloadComplete = (downloadId) => {
