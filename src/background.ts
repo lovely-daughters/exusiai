@@ -1,15 +1,29 @@
-const log = (text) => {
+const log = (text: string): void => {
   console.log(text);
 };
 log(`***-APPLE_CREAM_PIE-***`);
 log(`ID: ${chrome.runtime.id} \nService Worker Active`);
 
-const downloadQueue: string[] = [];
+interface DownloadItem {
+  url: string;
+}
+const downloadQueue: DownloadItem[] = [];
 
-const initiateDownloadSystem = async (
-  downloadQueue: string[],
+/**
+ * initiateDownloadSystem()
+ *
+ * The internals of the download system can be isolated from the rest of the
+ * codebase. The only interactions with it should be to push DownloadItems
+ * onto the downloadQueue. Said items will internally be distributed to
+ * workers for automatic processing.
+ *
+ * @param downloadQueue
+ * @param numWorkers
+ */
+async function initiateDownloadSystem<DownloadItem>(
+  downloadQueue: DownloadItem[],
   numWorkers: number
-) => {
+) {
   const sleep = async (duration: number = 500) => {
     await new Promise((resolve) => setTimeout(resolve, duration));
   };
@@ -18,12 +32,14 @@ const initiateDownloadSystem = async (
     return `DW-${String(index).padStart(3, "0")}`;
   };
 
-  const DWQueueMap = new Map();
-  const initiateDownloadWorker = async (workerId: string) => {
-    const DWQueue = [];
+  const DWQueueMap = new Map<string, DownloadItem[]>();
+  const initiateDownloadWorker = async (
+    workerId: string // prettier-ignore
+  ): Promise<void> => {
+    const DWQueue: DownloadItem[] = [];
     DWQueueMap.set(workerId, DWQueue);
 
-    const DWLog = (text) => {
+    const DWLog = (text: string): void => {
       log(`${workerId}: ${text}`);
     };
     DWLog(`Initiated`);
@@ -37,20 +53,25 @@ const initiateDownloadSystem = async (
     }
   };
 
-  const initiateDownloadWorkerManager = async (numWorkers) => {
+  const initiateDownloadWorkerManager = async (
+    numWorkers: number
+  ): Promise<void> => {
     var downloadsProcessed = 0;
 
-    const DWMLog = (text) => {
+    const DWMLog = (text: string): void => {
       log(`DWM: ${text}`);
     };
     DWMLog(`Initiated`);
 
     while (true) {
       if (downloadQueue.length) {
-        const item = downloadQueue.shift();
+        const item = downloadQueue.shift()!;
         const assignedDWId = downloadsProcessed % numWorkers;
-        const assignedDWQueue = DWQueueMap.get(generateWorkerId(assignedDWId));
-        assignedDWQueue.push(item);
+
+        // prettier-ignore
+        DWQueueMap 
+          ?.get(generateWorkerId(assignedDWId))
+          ?.push(item);
         DWMLog(`${item} => ${assignedDWId}`);
 
         downloadsProcessed += 1;
@@ -62,13 +83,7 @@ const initiateDownloadSystem = async (
     initiateDownloadWorker(generateWorkerId(index));
   }
   initiateDownloadWorkerManager(numWorkers);
-
-  await sleep(1500);
-  console.log(DWQueueMap);
-  for (var index = 0; index < 100; index++) {
-    downloadQueue.push(String(index));
-  }
-};
+}
 
 initiateDownloadSystem(downloadQueue, 3);
 
@@ -96,7 +111,7 @@ async function downloadManager() {}
 
 async function downloadImage(request, sendResponse) {
   const { doujinTitle, imageURL, fileName, fileExtension } = request.body;
-  downloadQueue.push(`${doujinTitle}/${fileName}.${fileExtension}`);
+  downloadQueue.push({ url: `${doujinTitle}/${fileName}.${fileExtension}` });
   // const downloadId = await chrome.downloads.download({
   //   filename: `${doujinTitle}/${fileName}.${fileExtension}`,
   //   url: imageURL,
