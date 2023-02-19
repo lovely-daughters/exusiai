@@ -13,9 +13,9 @@ const downloadQueue: DownloadItem[] = [];
  * initiateDownloadSystem()
  *
  * The internals of the download system can be isolated from the rest of the
- * codebase. The only interactions with it should be to push DownloadItems
- * onto the downloadQueue. Said items will internally be distributed to
- * workers for automatic processing.
+ * codebase. The only interactions with it should be trhough pushing
+ * DownloadItems onto the downloadQueue. Said items will internally be
+ * distributed to workers for automatic processing.
  *
  * @param downloadQueue
  * @param numWorkers
