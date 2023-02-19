@@ -8,10 +8,37 @@ interface DownloadItem {
   fileName: string;
   imageURL: string;
 }
-const downloadQueue: DownloadItem[] = [];
 interface DownloadResult {
-  error: string;
+  error: any;
 }
+const downloadQueue: DownloadItem[] = [];
+
+// sending results back to client-side
+const sendResponseMap = new Map<string, (response?: any) => void>();
+const enqueueDownload = (
+  item: DownloadItem,
+  sendResponse: (response?: any) => void
+) => {
+  sendResponseMap.set(item.imageURL, sendResponse);
+  downloadQueue.push(item);
+};
+
+// tracking when downloads complete
+const downloadPromiseMap = new Map<number, any>();
+const onDownloadComplete = (
+  downloadItemId: number
+): Promise<{ error: any }> => {
+  return new Promise((resolve) => {
+    downloadPromiseMap.set(downloadItemId, resolve);
+  });
+};
+chrome.downloads.onChanged.addListener(function ({ id, state, error }) {
+  if (state && state.current !== "in_progress") {
+    const resolve = downloadPromiseMap.get(id);
+    downloadPromiseMap.delete(id);
+    resolve({ error: error ? error : "" });
+  }
+});
 
 /**
  * initiateDownloadSystem()
@@ -28,7 +55,7 @@ async function initiateDownloadSystem<DownloadItem>(
   downloadQueue: DownloadItem[],
   numWorkers: number,
   download: (item: DownloadItem) => Promise<{ error: string }>,
-  sendResult: (result: DownloadResult, item: DownloadItem) => void
+  sendResultForItem: (result: DownloadResult, item: DownloadItem) => void
 ) {
   const sleep = async (duration: number = 500) => {
     await new Promise((resolve) => setTimeout(resolve, duration));
@@ -54,7 +81,8 @@ async function initiateDownloadSystem<DownloadItem>(
       if (DWQueue.length) {
         const item: DownloadItem = DWQueue.shift()!;
         const result = await download(item);
-        sendResult(result, item);
+        sendResultForItem(result, item);
+
         DWLog(`Processed ${JSON.stringify(item)}`);
       } else await sleep();
     }
@@ -92,31 +120,6 @@ async function initiateDownloadSystem<DownloadItem>(
   initiateDownloadWorkerManager(numWorkers);
 }
 
-const sendResponseMap = new Map<string, (response?: any) => void>();
-const enqueueDownload = (
-  item: DownloadItem,
-  sendResponse: (response?: any) => void
-) => {
-  sendResponseMap.set(item.imageURL, sendResponse);
-  downloadQueue.push(item);
-};
-
-const downloadPromises = new Map();
-const onDownloadComplete = (
-  downloadItemId: number
-): Promise<{ success: string; error: string }> => {
-  return new Promise((resolve) => {
-    downloadPromises.set(downloadItemId, resolve);
-  });
-};
-chrome.downloads.onChanged.addListener(function ({ id, state, error }) {
-  if (state && state.current !== "in_progress") {
-    const resolve = downloadPromises.get(id);
-    downloadPromises.delete(id);
-    resolve({ success: state.current === "complete", error });
-  }
-});
-
 initiateDownloadSystem<DownloadItem>(
   downloadQueue,
   3,
@@ -128,7 +131,7 @@ initiateDownloadSystem<DownloadItem>(
     const result = await onDownloadComplete(downloadItemId);
     return result;
   },
-  (result, item) => {
+  (result: DownloadResult, item: DownloadItem) => {
     const sendResponse = sendResponseMap.get(item.imageURL)!;
     sendResponse(result);
   }
@@ -142,13 +145,11 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     sendResponse(exuDataURL);
   } else if (request.query === "download") {
     const { doujinTitle, imageURL, fileName, fileExtension } = request.body;
-    enqueueDownload(
-      {
-        fileName: `${doujinTitle}/${fileName}.${fileExtension}`,
-        imageURL: imageURL,
-      },
-      sendResponse
-    );
+    const item: DownloadItem = {
+      fileName: `${doujinTitle}/${fileName}.${fileExtension}`,
+      imageURL: imageURL,
+    };
+    enqueueDownload(item, sendResponse);
   }
 
   return true;
