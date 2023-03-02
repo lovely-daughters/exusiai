@@ -19,6 +19,10 @@
     {
       "matches": ["https://*.nhentai.net/*"],
       "js": ["src/nhentai.js"]
+    },
+    {
+      "matches": ["https://*.youtube.com/"],
+      "js": ["src/halt.js"]
     }
   ],
   "web_accessible_resources": [

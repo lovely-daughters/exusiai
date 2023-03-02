@@ -7,6 +7,7 @@ const config: webpack.Configuration = {
   entry: {
     background: path.join(__dirname, "src", "background.ts"),
     nhentai: path.join(__dirname, "src", "nhentai.ts"),
+    halt: path.join(__dirname, "src", "halt.ts"),
   },
   output: {
     path: path.join(__dirname, "dist", "src"),
