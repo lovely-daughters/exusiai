@@ -145,8 +145,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     sendResponse(exuDataURL);
   } else if (request.query === "download") {
     const { doujinTitle, imageURL, fileName, fileExtension } = request.body;
+    const sym = "doujindl_cli";
     const item: DownloadItem = {
-      fileName: `${doujinTitle}/${fileName}.${fileExtension}`,
+      fileName: `symlinks/${sym}/${doujinTitle}/${fileName}.${fileExtension}`,
       imageURL: imageURL,
     };
     enqueueDownload(item, sendResponse);
