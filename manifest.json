@@ -21,13 +21,13 @@
       "js": ["src/nhentai.js"]
     },
     {
-      "matches": ["https://*.youtube.com/"],
+      "matches": ["https://*.youtube.com/*", "https://*.twitter.com/*"],
       "js": ["src/halt.js"]
     }
   ],
   "web_accessible_resources": [
     {
-      "matches": [ "https://*.nhentai.net/*" ],
+      "matches": [ "https://*.nhentai.net/*", "https://*.youtube.com/*"],
       "resources": ["images/*"]
     }
   ]

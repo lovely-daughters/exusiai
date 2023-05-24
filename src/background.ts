@@ -143,6 +143,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.query === "exuKyaaDataURL") {
     const exuDataURL = chrome.runtime.getURL("../images/exuKyaa.png");
     sendResponse(exuDataURL);
+  } else if (request.query === "candy") {
+    sendResponse(chrome.runtime.getURL("../images/96775030_p0.png"));
   } else if (request.query === "download") {
     const { doujinTitle, imageURL, fileName, fileExtension } = request.body;
     const sym = "doujindl_cli";
