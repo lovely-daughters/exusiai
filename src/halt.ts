@@ -1,13 +1,13 @@
 const images: string[] = [
-  // chongzhen
-  "https://pbs.twimg.com/media/FpC9WgqaAAALIux?format=jpg&name=large",
+    // chongzhen
+    "https://pbs.twimg.com/media/FpC9WgqaAAALIux?format=jpg&name=large",
 ];
 
-window.addEventListener("load", function () {
-  document.body.innerHTML += `<img id="candy" style="position:fixed; top:0px; right:0px; border-radius:10px; cursor:pointer;" width="100%" src='${
-    images[Math.floor(Math.random() * images.length)]
-  }'>`;
-});
+// window.addEventListener("load", function () {
+//   document.body.innerHTML += `<img id="candy" style="position:fixed; top:0px; right:0px; border-radius:10px; cursor:pointer;" width="100%" src='${
+//     images[Math.floor(Math.random() * images.length)]
+//   }'>`;
+// });
 
 // const main = async () => {
 //   // images[Math.floor(Math.random() * images.length)]
@@ -20,4 +20,4 @@ window.addEventListener("load", function () {
 
 // // if (!sanity) document.body.innerHTML = "";
 // // if (!sanity) window.location.href = "https://mail.google.com/";
-// export {};
+export {};
