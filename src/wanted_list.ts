@@ -30,30 +30,20 @@ const observer = new MutationObserver((mutationsList, observer) => {
                 if (addedNode.nodeType == 1) {
                     // check wanted list
                     for (const target of hunted) {
-                        if (
-                            window.location.href == target.huntingGround &&
-                            (<HTMLElement>addedNode).matches(target.selector)
-                        ) {
-                            (<HTMLElement>addedNode).remove();
-                            // (<HTMLElement>addedNode).replaceWith(
-                            //     `<img
-                            //         id="candy"
-                            //         style="
-                            //             position:fixed;
-                            //             top:0px; right:0px;
-                            //             border-radius:10px; cursor:pointer;
-                            //             width: 100%;
-                            //         "
-                            //         src=${
-                            //             images[
-                            //                 Math.floor(
-                            //                     Math.random() * images.length
-                            //                 )
-                            //             ]
-                            //         }
-                            //     >`
-                            // );
-                            console.log(`\n\n\nHUNTED:\n${target.name}\n\n\n`);
+                        try {
+                            if (
+                                window.location.href == target.huntingGround &&
+                                (<HTMLElement>addedNode).matches(
+                                    target.selector
+                                )
+                            ) {
+                                (<HTMLElement>addedNode).remove();
+                                console.log(
+                                    `\n\n\nHUNTED:\n${target.name}\n\n\n`
+                                );
+                            }
+                        } catch (error) {
+                            console.error(error);
                         }
                     }
                 }
@@ -65,3 +55,22 @@ const observer = new MutationObserver((mutationsList, observer) => {
 observer.observe(document.body, { childList: true, subtree: true });
 
 export {};
+
+// (<HTMLElement>addedNode).replaceWith(
+//     `<img
+//         id="candy"
+//         style="
+//             position:fixed;
+//             top:0px; right:0px;
+//             border-radius:10px; cursor:pointer;
+//             width: 100%;
+//         "
+//         src=${
+//             images[
+//                 Math.floor(
+//                     Math.random() * images.length
+//                 )
+//             ]
+//         }
+//     >`
+// );
